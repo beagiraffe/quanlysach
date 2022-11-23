@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Book Management System</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+  <style>
+    table {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="#">Book Management System</a>
+
+  <!-- Toggler/collapsibe Button -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Navbar links -->
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li sec:authorize="!isAuthenticated()" class="nav-item">
+        <a class="nav-link" th:href="@{/login}">Login</a>
+      </li>
+      <li sec:authorize="!isAuthenticated()" class="nav-item">
+        <a class="nav-link" href="/registration">Register</a>
+      </li>
+      <li sec:authorize="isAuthenticated()" class="nav-item">
+        <form id="logoutForm" method="POST" th:action="@{/logout}">
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </form>
+
+        <a class="nav-link" onclick="document.forms['logoutForm'].submit()">Welcome <span sec:authentication="name"></span> | Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class ="container">
+  <div class = "row">
+    <h1> List Books </h1>
+  </div>
+
+  <div sec:authorize="isAuthenticated()">
+    <div class = "row">
+      <div class = "col-lg-3">
+        <a th:href = "@{/books/new}" class = "btn btn-primary btn-sm mb-3"> Add Book</a>
+      </div>
+    </div>
+  </div>
+
+  <table class = "table table-striped table-bordered">
+    <thead class = "table-dark">
+    <tr>
+      <th> Title </th>
+      <th> Author</th>
+      <th> Description </th>
+      <th> Published date </th>
+      <th> Number of pages </th>
+      <th> Category </th>
+      <th> Photo </th>
+      <th sec:authorize="isAuthenticated()"> Actions </th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each = "book: ${books}">
+      <td th:text = "${book.title}"></td>
+      <td th:text = "${book.author}"></td>
+      <td th:text = "${book.description}"></td>
+      <td th:text="${#strings.arraySplit(book.publishedDate,' ')[0]}"></td>
+      <td th:text = "${book.numberOfPages}"></td>
+      <td th:text = "${book.category.getName()}"></td>
+      <td>
+        <img th:src="@{${book.getPhotoPath()}}" width="50" height="50"/>
+      </td>
+      <td sec:authorize="isAuthenticated()">
+        <a th:href = "@{/books/view/{id}(id=${book.id})}"
+           class = "btn btn-primary">View</a>
+
+        <a th:href = "@{/books/{id}(id=${book.id})}" onclick="return confirm('Are you sure?')"
+           class = "btn btn-danger">Delete</a>
+
+      </td>
+    </tr>
+    </tbody>
+
+  </table>
+
+</div>
+</body>
+</html>

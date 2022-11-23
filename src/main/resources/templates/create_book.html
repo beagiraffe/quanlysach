@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Book Management System</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <style>
+    .has-error {
+      color: red;
+    }
+    .box-footer {
+      float: right;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="#">Book Management System</a>
+
+  <!-- Toggler/collapsibe Button -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Navbar links -->
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/books}">Book Management</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<br>
+<br>
+<div class = "container">
+  <div class = "row">
+    <div class ="col-lg-12 col-md-12 col-sm-12 container justify-content-center card">
+      <h1 class = "text-center"> Book </h1>
+      <div class = "card-body">
+        <form th:action="${mode}=='create' ? @{/books} : @{/books/{id}(id=${book.id})}" th:object = "${book}" method="POST" enctype="multipart/form-data">
+          <div class='row'>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label> Title </label>
+                <input th:readonly="${mode=='view'}"
+                        type = "text"
+                        name = "title"
+                        th:field = "*{title}"
+                        class = "form-control"
+                        placeholder="Enter Book Title"
+                />
+                <span class="has-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+              </div>
+            </div>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label> Author </label>
+                <input th:readonly="${mode=='view'}"
+                       type = "text"
+                       name = "author"
+                       th:field = "*{author}"
+                       class = "form-control"
+                       placeholder="Enter Book Author"
+                />
+                <span class="has-error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+              </div>
+            </div>
+            <div th:if="${mode!='view'}" style="text-align: center" class='col-sm-4'>
+              <label style="color: white"> . </label> <br>
+                <input type="file" style="display: none" name="image" class="file" accept="image/*">
+                  <input type="text" style="display: none" class="form-control" disabled placeholder="Upload File" id="file">
+                  <div class="input-group-append" style="display: contents">
+                    <button type="button" class="browse btn btn-primary">Upload</button>
+                  </div>
+            </div>
+          </div>
+
+          <div class='row'>
+            <div class='col-sm-8'>
+              <div class ="form-group">
+                <label> Description </label>
+                <input style="height: 200px" th:readonly="${mode=='view'}"
+                        type = "text"
+                        name = "description"
+                        th:field = "*{description}"
+                        class = "form-control"
+                        placeholder="Enter Book Description"
+                />
+                <span class="has-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+              </div>
+            </div>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label>  </label> <br>
+                <img id="preview" th:src="@{${book.getPhotoPath()}}" class="img-thumbnail">
+                <input style="display:none; height: 200px" th:readonly="${mode=='view'}"
+                       type = "text"
+                       name = "description"
+                       th:field = "*{photos}"
+                       class = "form-control"
+                       placeholder="Enter Book Description"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class='row'>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label> Published Date </label>
+                <input th:readonly="${mode=='view'}"
+                        type = "date"
+                        name = "publishedDate"
+                        th:field = "*{publishedDate}"
+                        class = "form-control"
+                        placeholder="Enter Book Published Date"
+                />
+                <span class="has-error" th:if="${#fields.hasErrors('publishedDate')}" th:errors="*{publishedDate}"></span>
+              </div>
+            </div>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label> Number of pages </label>
+                <input th:readonly="${mode=='view'}"
+                       type = "number"
+                       name = "numberOfPages"
+                       th:field = "*{numberOfPages}"
+                       class = "form-control"
+                       placeholder="Enter Number Of Pages"
+                />
+                <span class="has-error" th:if="${#fields.hasErrors('numberOfPages')}" th:errors="*{numberOfPages}"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class='row'>
+            <div class='col-sm-4'>
+              <div class ="form-group">
+                <label> Category </label>
+                <select th:disabled="${mode=='view'}" th:readonly="${mode=='view'}" name="category" id="cars" th:field = "*{category}" class = "form-control" placeholder="Select Book Category">
+                  <option th:each = "cat: ${categories}" th:text="${cat.name}"
+                          th:value="${cat.id}">
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div th:if="${mode=='view'}" class = "box-footer">
+              <a th:href = "@{/books/edit/{id}(id=${book.id})}"
+                 class = "btn btn-primary">Edit</a>
+          </div>
+          <div th:if="${mode=='create'}" class = "box-footer">
+            <button type="submit" class = "btn btn-primary">
+              Add
+            </button>
+          </div>
+          <div th:if="${mode=='edit'}" class = "box-footer">
+            <button type="submit" class = "btn btn-primary">
+              Save
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).on("click", ".browse", function() {
+    console.log('Go here');
+    var file = $(this).parents().find(".file");
+    file.trigger("click");
+  });
+  $('input[type="file"]').change(function(e) {
+    var fileName = e.target.files[0].name;
+    $("#file").val(fileName);
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      // get loaded data and render thumbnail.
+      document.getElementById("preview").src = e.target.result;
+    };
+    // read the image file as a data URL.
+    reader.readAsDataURL(this.files[0]);
+  });
+</script>
+</body>
+</html>
